@@ -8,7 +8,8 @@ import {
   Lock, ChevronRight
 } from 'lucide-react';
 import { useApp } from '../store';
-import { Task, TaskPriority, TaskStatus, User as UserType, IssueLink } from '../types';
+// Fix: Use TaskLink instead of non-existent IssueLink
+import { Task, TaskPriority, TaskStatus, User as UserType, TaskLink } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface TaskDetailsModalProps {
@@ -60,8 +61,9 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({ taskId, onClose, on
     updateTask(task.id, updates);
   };
 
-  const addDependency = (targetId: string, type: IssueLink['type']) => {
-    const newLink: IssueLink = { type, targetTaskId: targetId };
+  // Fix: Use TaskLink instead of non-existent IssueLink
+  const addDependency = (targetId: string, type: TaskLink['type']) => {
+    const newLink: TaskLink = { type, targetTaskId: targetId };
     handleUpdate({ links: [...task.links, newLink] });
     
     // Attempt bi-directional link if possible in this simple store

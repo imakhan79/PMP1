@@ -18,14 +18,15 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 
 const StatusIcon: React.FC<{ status: TaskStatus; onClick?: () => void }> = ({ status, onClick }) => {
-  const icons = {
+  const s = status.toUpperCase();
+  const icons: Record<string, React.ReactNode> = {
     BACKLOG: <Circle className="w-5 h-5 text-slate-300" />,
     TODO: <Circle className="w-5 h-5 text-slate-400" />,
     IN_PROGRESS: <Clock className="w-5 h-5 text-[var(--primary)]" />,
     REVIEW: <AlertCircle className="w-5 h-5 text-amber-500" />,
     DONE: <CheckCircle2 className="w-5 h-5 text-emerald-500" />,
   };
-  return <button onClick={onClick} className="hover:scale-125 transition-transform active:scale-95">{icons[status] || icons.TODO}</button>;
+  return <button onClick={onClick} className="hover:scale-125 transition-transform active:scale-95">{icons[s] || icons.TODO}</button>;
 };
 
 const PriorityTag: React.FC<{ priority: TaskPriority }> = ({ priority }) => {
@@ -48,25 +49,29 @@ const MyTasks: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState<'ACTIVE' | 'DONE' | 'ALL'>('ACTIVE');
 
   const myTasks = useMemo(() => {
+    if (!currentUser) return [];
     return tasks.filter(t => {
       const isMine = t.assigneeId === currentUser.id;
       const matchesSearch = t.title.toLowerCase().includes(search.toLowerCase());
       const matchesStatus = 
         filterStatus === 'ALL' ? true :
-        filterStatus === 'DONE' ? t.status === 'done' :
-        t.status !== 'done';
+        filterStatus === 'DONE' ? t.status.toLowerCase() === 'done' :
+        t.status.toLowerCase() !== 'done';
       return isMine && matchesSearch && matchesStatus;
     });
-  }, [tasks, currentUser.id, search, filterStatus]);
+  }, [tasks, currentUser, search, filterStatus]);
 
   const handleToggleStatus = (task: Task) => {
-    const statusOrder: TaskStatus[] = ['todo', 'in_progress', 'review', 'done'];
-    const currentIndex = statusOrder.indexOf(task.status);
+    const statusOrder = ['todo', 'in_progress', 'review', 'done'];
+    const current = task.status.toLowerCase();
+    const currentIndex = statusOrder.indexOf(current);
     const nextStatus = currentIndex === -1 || currentIndex === statusOrder.length - 1 
       ? statusOrder[0] 
       : statusOrder[currentIndex + 1];
     updateTask(task.id, { status: nextStatus });
   };
+
+  if (!currentUser) return null;
 
   return (
     <div className="p-8 lg:p-12 max-w-6xl mx-auto space-y-10 pb-32">
@@ -116,8 +121,8 @@ const MyTasks: React.FC = () => {
                 {tasks.filter(t => {
                   const isMine = t.assigneeId === currentUser.id;
                   if (tab === 'ALL') return isMine;
-                  if (tab === 'DONE') return isMine && t.status === 'done';
-                  return isMine && t.status !== 'done';
+                  if (tab === 'DONE') return isMine && t.status.toLowerCase() === 'done';
+                  return isMine && t.status.toLowerCase() !== 'done';
                 }).length}
               </span>
             </span>
@@ -146,7 +151,7 @@ const MyTasks: React.FC = () => {
                   className="group bg-[var(--surface)] p-5 rounded-3xl border border-[var(--border)] shadow-sm hover:shadow-xl hover:shadow-slate-200/40 dark:hover:shadow-black/40 transition-all flex flex-col md:flex-row md:items-center gap-6"
                 >
                   <div className="flex items-center gap-5 flex-1 min-w-0">
-                    <StatusIcon status={task.status as TaskStatus} onClick={() => handleToggleStatus(task)} />
+                    <StatusIcon status={task.status} onClick={() => handleToggleStatus(task)} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 mb-2">
                         <div className="flex items-center gap-1 text-[10px] font-black text-slate-400 uppercase tracking-widest">
@@ -155,7 +160,7 @@ const MyTasks: React.FC = () => {
                         </div>
                         <PriorityTag priority={task.priority} />
                       </div>
-                      <h3 className={`text-base font-black tracking-tight truncate ${task.status === 'done' ? 'text-slate-400 line-through' : 'text-[var(--text)]'}`}>
+                      <h3 className={`text-base font-black tracking-tight truncate ${task.status.toLowerCase() === 'done' ? 'text-slate-400 line-through' : 'text-[var(--text)]'}`}>
                         {task.title}
                       </h3>
                     </div>
@@ -163,7 +168,7 @@ const MyTasks: React.FC = () => {
 
                   <div className="flex items-center justify-between md:justify-end gap-8 pl-10 md:pl-0 border-t md:border-t-0 pt-4 md:pt-0 border-slate-50 dark:border-slate-800">
                     {task.dueDate && (
-                      <div className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-widest ${new Date(task.dueDate) < new Date() && task.status !== 'done' ? 'text-rose-500' : 'text-slate-400'}`}>
+                      <div className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-widest ${new Date(task.dueDate) < new Date() && task.status.toLowerCase() !== 'done' ? 'text-rose-500' : 'text-slate-400'}`}>
                         <Calendar className="w-4 h-4" />
                         {new Date(task.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                       </div>

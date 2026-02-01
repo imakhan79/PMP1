@@ -1,7 +1,8 @@
 
 import React, { useState } from 'react';
 import { useApp } from '../store';
-import { Task, IssueType, TaskPriority } from '../types';
+// Fix: Use TaskType instead of non-existent IssueType
+import { Task, TaskType, TaskPriority } from '../types';
 import { 
   ChevronDown, 
   ChevronRight, 
@@ -20,7 +21,8 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const IssueTypeIcon: React.FC<{ type: IssueType }> = ({ type }) => {
+// Fix: Use TaskType instead of non-existent IssueType
+const IssueTypeIcon: React.FC<{ type: TaskType }> = ({ type }) => {
   switch (type) {
     case 'BUG': return <Bug className="w-4 h-4 text-rose-500" />;
     case 'STORY': return <Bookmark className="w-4 h-4 text-emerald-500 fill-emerald-500" />;

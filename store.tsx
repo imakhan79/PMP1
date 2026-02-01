@@ -92,7 +92,7 @@ const INITIAL_DATA: AppState = {
   invites: [],
   projects: [
     { 
-      id: 'p1', workspaceId: 'w1', name: 'Mobile App Revamp', key: 'MAR', status: 'ACTIVE', leadId: 'u1', members: ['u1', 'u2', 'u3'], issueTypes: ['STORY', 'BUG', 'TASK'],
+      id: 'p1', workspaceId: 'w1', name: 'Mobile App Revamp', key: 'MAR', status: 'ACTIVE', leadId: 'u1', members: ['u1', 'u2', 'u3'], taskTypes: ['STORY', 'BUG', 'TASK'],
       workflow: [
         { id: 'todo', label: 'To Do', category: 'TODO' },
         { id: 'in_progress', label: 'In Progress', category: 'IN_PROGRESS' },
@@ -100,7 +100,7 @@ const INITIAL_DATA: AppState = {
       ]
     },
     { 
-      id: 'p2', workspaceId: 'w1', name: 'Backend Infrastructure', key: 'INF', status: 'ACTIVE', leadId: 'u2', members: ['u1', 'u2'], issueTypes: ['STORY', 'BUG', 'TASK'],
+      id: 'p2', workspaceId: 'w1', name: 'Backend Infrastructure', key: 'INF', status: 'ACTIVE', leadId: 'u2', members: ['u1', 'u2'], taskTypes: ['STORY', 'BUG', 'TASK'],
       workflow: [
         { id: 'todo', label: 'Backlog', category: 'TODO' },
         { id: 'in_progress', label: 'Developing', category: 'IN_PROGRESS' },
@@ -149,12 +149,13 @@ const INITIAL_DATA: AppState = {
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, setState] = useState<AppState>(() => {
-    const saved = localStorage.getItem('aslam_pm_v5_final');
+    // Bumped key to v6 to force re-seed and fix potential blank screen issues
+    const saved = localStorage.getItem('aslam_pm_v6_prod');
     return saved ? JSON.parse(saved) : INITIAL_DATA;
   });
 
   useEffect(() => {
-    localStorage.setItem('aslam_pm_v5_final', JSON.stringify(state));
+    localStorage.setItem('aslam_pm_v6_prod', JSON.stringify(state));
     const userPref = state.preferences.find(p => p.userId === state.currentUser?.id);
     const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
     

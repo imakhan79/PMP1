@@ -103,7 +103,7 @@ export interface Invite {
 }
 
 export type ProjectStatus = 'ACTIVE' | 'ARCHIVED' | 'PLANNING';
-export type IssueType = 'STORY' | 'TASK' | 'BUG' | 'EPIC';
+export type TaskType = 'STORY' | 'TASK' | 'BUG' | 'EPIC';
 export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
 export type TaskStatus = string;
 
@@ -115,7 +115,7 @@ export interface WorkflowStatus {
   allowedRoles?: UserRole[];
 }
 
-export interface IssueLink {
+export interface TaskLink {
   type: 'BLOCKS' | 'BLOCKED_BY' | 'RELATES_TO';
   targetTaskId: string;
 }
@@ -130,7 +130,7 @@ export interface Project {
   leadId: string;
   members: string[];
   workflow: WorkflowStatus[];
-  issueTypes: IssueType[];
+  taskTypes: TaskType[];
 }
 
 export interface Task {
@@ -139,7 +139,7 @@ export interface Task {
   number: number;
   title: string;
   description: string;
-  type: IssueType;
+  type: TaskType;
   status: TaskStatus;
   priority: TaskPriority;
   assigneeId?: string;
@@ -147,9 +147,9 @@ export interface Task {
   dueDate?: string;
   estimate?: number; 
   labels: string[];
-  links: IssueLink[];
+  links: TaskLink[];
   epicId?: string;
-  sprintId?: string; // Added sprintId to resolve property issues
+  sprintId?: string;
   createdAt: string;
   updatedAt: string;
 }

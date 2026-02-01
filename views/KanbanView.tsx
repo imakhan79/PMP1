@@ -1,7 +1,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../store';
-import { Task, TaskPriority, IssueType, WorkflowStatus, UserRole } from '../types';
+// Fix: Use TaskType instead of non-existent IssueType
+import { Task, TaskPriority, TaskType, WorkflowStatus, UserRole } from '../types';
 import { 
   MoreVertical, Plus, Clock, MessageSquare, 
   Calendar, Users, Layers, AlertCircle,
@@ -30,7 +31,8 @@ import CreateTaskModal from '../components/CreateTaskModal';
 
 type SwimlaneType = 'ASSIGNEE' | 'EPIC' | 'PRIORITY' | 'NONE';
 
-const IssueTypeIcon: React.FC<{ type: IssueType }> = ({ type }) => {
+// Fix: Use TaskType instead of non-existent IssueType
+const IssueTypeIcon: React.FC<{ type: TaskType }> = ({ type }) => {
   switch (type) {
     case 'BUG': return <Bug className="w-4 h-4 text-rose-500" />;
     case 'STORY': return <Bookmark className="w-4 h-4 text-emerald-500 fill-emerald-500" />;
