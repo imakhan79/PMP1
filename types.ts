@@ -3,40 +3,121 @@ export type UserRole = 'OWNER' | 'ADMIN' | 'MEMBER' | 'VIEWER';
 export type ThemeMode = 'light' | 'dark';
 export type AccentColor = 'ocean' | 'aurora' | 'forest' | 'ember' | 'slate' | 'sunrise';
 
+export type WorkspaceStatus = 'ACTIVE' | 'ARCHIVED' | 'DELETED';
+export type MembershipStatus = 'ACTIVE' | 'INVITED' | 'SUSPENDED';
+export type PlanType = 'FREE' | 'PRO' | 'BUSINESS';
+
 export interface User {
   id: string;
   name: string;
   email: string;
   avatar?: string;
-  role: UserRole;
   timezone: string;
   status: 'ACTIVE' | 'INACTIVE';
+  emailVerified: boolean;
+  passwordHash?: string;
+  createdAt: string;
+}
+
+export interface UserPreference {
+  userId: string;
+  theme: ThemeMode;
+  accent: AccentColor;
+  notifications: {
+    email: boolean;
+    push: boolean;
+    mentions: boolean;
+  };
+}
+
+export interface WorkspaceBranding {
+  primaryColor: string;
+  surfaceStyle: 'glass' | 'solid' | 'minimal';
+  logoUrl?: string;
+}
+
+export interface WorkspaceLocalization {
+  timezone: string;
+  dateFormat: string;
+  timeFormat: '12h' | '24h';
+  weekStartDay: 0 | 1 | 6; // Sun, Mon, Sat
+}
+
+export interface WorkspaceSettings {
+  theme: ThemeMode;
+  accent: AccentColor;
+  reduceMotion: boolean;
 }
 
 export interface Workspace {
   id: string;
   name: string;
   slug: string;
+  description?: string;
   logo?: string;
   ownerId: string;
-  settings: {
-    workingDays: number[];
-    defaultTimezone: string;
-    theme: ThemeMode;
-    accent: AccentColor;
-    reduceMotion: boolean;
-  };
+  status: WorkspaceStatus;
+  branding: WorkspaceBranding;
+  localization: WorkspaceLocalization;
+  settings: WorkspaceSettings;
+  archivedAt?: string;
+  deletedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Membership {
+  workspaceId: string;
+  userId: string;
+  role: UserRole;
+  status: MembershipStatus;
+  joinedAt: string;
+  suspendedAt?: string;
+}
+
+export interface WorkspacePlan {
+  workspaceId: string;
+  plan: PlanType;
+  status: 'ACTIVE' | 'PAST_DUE' | 'CANCELED';
+  maxMembers: number;
+  maxProjects: number;
+  storageQuotaGb: number;
+}
+
+export interface WorkspaceUsage {
+  workspaceId: string;
+  membersCount: number;
+  projectsCount: number;
+  storageBytes: number;
+}
+
+export interface Invite {
+  id: string;
+  workspaceId: string;
+  email: string;
+  role: UserRole;
+  token: string;
+  expiresAt: string;
+  status: 'PENDING' | 'ACCEPTED' | 'REVOKED';
+  invitedBy: string;
 }
 
 export type ProjectStatus = 'ACTIVE' | 'ARCHIVED' | 'PLANNING';
 export type IssueType = 'STORY' | 'TASK' | 'BUG' | 'EPIC';
+export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+export type TaskStatus = string;
 
 export interface WorkflowStatus {
   id: string;
   label: string;
-  category: 'TODO' | 'IN_PROGRESS' | 'DONE';
+  category: 'BACKLOG' | 'TODO' | 'IN_PROGRESS' | 'DONE';
   wipLimit?: number;
-  allowedRoles?: UserRole[]; // New field for RBAC transitions
+  allowedRoles?: UserRole[];
+}
+
+export interface IssueLink {
+  type: 'BLOCKS' | 'BLOCKED_BY' | 'RELATES_TO';
+  targetTaskId: string;
 }
 
 export interface Project {
@@ -52,18 +133,9 @@ export interface Project {
   issueTypes: IssueType[];
 }
 
-export type TaskStatus = string;
-export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
-
-export interface IssueLink {
-  type: 'BLOCKS' | 'BLOCKED_BY' | 'RELATES_TO';
-  targetTaskId: string;
-}
-
 export interface Task {
   id: string;
   projectId: string;
-  epicId?: string;
   number: number;
   title: string;
   description: string;
@@ -74,36 +146,21 @@ export interface Task {
   reporterId: string;
   dueDate?: string;
   estimate?: number; 
-  originalEstimateHours?: number;
-  remainingEstimateHours?: number;
   labels: string[];
-  parentId?: string;
-  sprintId?: string;
   links: IssueLink[];
+  epicId?: string;
+  sprintId?: string; // Added sprintId to resolve property issues
   createdAt: string;
   updatedAt: string;
-  completedAt?: string;
 }
 
-export interface Sprint {
+export interface WikiPage {
   id: string;
   projectId: string;
-  name: string;
-  startDate: string;
-  endDate: string;
-  status: 'PLANNED' | 'ACTIVE' | 'COMPLETED';
-  capacity?: Record<string, number>;
-}
-
-export interface TimeEntry {
-  id: string;
-  taskId: string;
-  userId: string;
-  duration: number;
-  date: string;
-  description?: string;
-  isBillable: boolean;
-  status: 'PENDING' | 'APPROVED';
+  title: string;
+  content: string;
+  updatedBy: string;
+  updatedAt: string;
 }
 
 export interface Comment {
@@ -112,37 +169,33 @@ export interface Comment {
   userId: string;
   content: string;
   createdAt: string;
-  editHistory?: { content: string; editedAt: string }[];
-}
-
-export interface WikiPage {
-  id: string;
-  projectId: string;
-  parentId?: string;
-  title: string;
-  content: string;
-  updatedBy: string;
-  updatedAt: string;
 }
 
 export interface Notification {
   id: string;
   userId: string;
-  type: 'MENTION' | 'ASSIGNMENT' | 'STATUS_CHANGE' | 'DUE_SOON' | 'COMMENT';
   title: string;
   message: string;
   read: boolean;
-  link?: string;
   createdAt: string;
+}
+
+export interface Sprint {
+  id: string;
+  projectId: string;
+  name: string;
+  status: 'PLANNED' | 'ACTIVE' | 'COMPLETED';
+  startDate: string;
+  endDate: string;
 }
 
 export interface AuditLog {
   id: string;
   workspaceId: string;
-  userId: string;
+  actorId: string;
   action: string;
-  entityType: string;
-  entityId: string;
+  targetType: string;
+  targetId: string;
   metadata?: any;
   createdAt: string;
 }

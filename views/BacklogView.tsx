@@ -43,7 +43,7 @@ const PriorityIcon: React.FC<{ priority: TaskPriority }> = ({ priority }) => {
   );
 };
 
-const BacklogItem: React.FC<{ task: Task }> = ({ task }) => {
+const BacklogItem: React.FC<{ task: Task; projectKey: string }> = ({ task, projectKey }) => {
   const { users } = useApp();
   const assignee = users.find(u => u.id === task.assigneeId);
 
@@ -54,7 +54,7 @@ const BacklogItem: React.FC<{ task: Task }> = ({ task }) => {
     >
       <GripVertical className="w-4 h-4 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity" />
       <IssueTypeIcon type={task.type} />
-      <span className="text-[10px] font-black text-slate-400 w-16 uppercase tracking-widest">MAR-{task.number}</span>
+      <span className="text-[10px] font-black text-slate-400 w-16 uppercase tracking-widest">{projectKey}-{task.number}</span>
       <p className="text-sm font-bold text-[var(--text)] flex-1 truncate tracking-tight">{task.title}</p>
       
       <div className="flex items-center gap-5 px-4">
@@ -82,7 +82,10 @@ const BacklogItem: React.FC<{ task: Task }> = ({ task }) => {
 };
 
 const BacklogView: React.FC<{ projectId: string }> = ({ projectId }) => {
-  const { tasks, sprints, users } = useApp();
+  const { tasks, sprints, projects } = useApp();
+  const project = projects.find(p => p.id === projectId);
+  if (!project) return null;
+
   const projectTasks = tasks.filter(t => t.projectId === projectId);
   const activeSprint = sprints.find(s => s.projectId === projectId && s.status === 'ACTIVE');
   const backlogTasks = projectTasks.filter(t => !t.sprintId);
@@ -155,11 +158,11 @@ const BacklogView: React.FC<{ projectId: string }> = ({ projectId }) => {
             </div>
           </div>
           <div className="divide-y divide-slate-100 dark:divide-slate-800">
-            {sprintTasks.map(task => <BacklogItem key={task.id} task={task} />)}
+            {sprintTasks.map(task => <BacklogItem key={task.id} task={task} projectKey={project.key} />)}
             {sprintTasks.length === 0 && (
               <div className="p-16 text-center text-slate-400 space-y-2">
                 <p className="text-sm font-bold">This sprint is currently empty</p>
-                <p className="text-xs">Drag and drop issues from the backlog to begin planning.</p>
+                <p className="text-xs">Drag and drop tasks from the backlog to begin planning.</p>
               </div>
             )}
           </div>
@@ -175,12 +178,12 @@ const BacklogView: React.FC<{ projectId: string }> = ({ projectId }) => {
             </div>
             <div>
               <h2 className="text-lg font-black text-[var(--text)] tracking-tight">Master Backlog</h2>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-0.5">{backlogTasks.length} unassigned issues</p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-0.5">{backlogTasks.length} unassigned items</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <button className="flex items-center gap-2 text-[10px] font-black text-[var(--primary)] bg-[var(--primary)]/5 px-5 py-2.5 rounded-xl hover:bg-[var(--primary)]/10 transition-all">
-              <Plus className="w-4 h-4" /> Create Issue
+              <Plus className="w-4 h-4" /> Create Task
             </button>
           </div>
         </div>
@@ -193,7 +196,7 @@ const BacklogView: React.FC<{ projectId: string }> = ({ projectId }) => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: idx * 0.02 }}
               >
-                <BacklogItem task={task} />
+                <BacklogItem task={task} projectKey={project.key} />
               </motion.div>
             ))}
           </AnimatePresence>

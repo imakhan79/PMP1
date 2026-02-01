@@ -20,9 +20,11 @@ import {
   ArrowLeftRight,
   ChevronRight,
   ShieldCheck,
-  Unlock
+  Unlock,
+  Settings2,
+  LayoutTemplate
 } from 'lucide-react';
-import { motion, Reorder, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import TaskDetailsModal from '../components/TaskDetailsModal';
 import CreateTaskModal from '../components/CreateTaskModal';
 
@@ -130,7 +132,7 @@ const TaskCard: React.FC<{ task: Task; workflow: WorkflowStatus[]; onClick: () =
               <div className="p-2 space-y-1">
                 <p className="px-3 py-1 text-[8px] font-black text-slate-400 uppercase tracking-widest border-b border-[var(--border)] mb-1">Move to State</p>
                 {workflow.filter(w => w.id !== task.status).map(w => {
-                  const isRestricted = !isPrivileged && w.allowedRoles && !w.allowedRoles.includes(currentUser.role);
+                  const isRestricted = !isPrivileged && w.allowedRoles && w.allowedRoles.length > 0 && !w.allowedRoles.includes(currentUser.role);
                   return (
                     <button
                       key={w.id}
@@ -180,7 +182,7 @@ const TaskCard: React.FC<{ task: Task; workflow: WorkflowStatus[]; onClick: () =
 
         <div className="flex flex-wrap gap-1.5 mb-4">
           {task.labels.map(label => (
-            <span key={label} className="text-[9px] bg-[var(--primary)]/10 text-[var(--primary)] px-2 py-0.5 rounded-md font-bold uppercase">
+            <span key={label} className="text-[9px] font-bold text-[var(--primary)] px-2 py-0.5 rounded-md bg-[var(--primary)]/10 uppercase">
               {label}
             </span>
           ))}
@@ -248,7 +250,7 @@ const KanbanView: React.FC<{ projectId: string }> = ({ projectId }) => {
 
   const handleMoveTask = (taskId: string, targetStatusId: string) => {
     const targetStatus = project.workflow.find(w => w.id === targetStatusId);
-    if (!isPrivileged && targetStatus?.allowedRoles && !targetStatus.allowedRoles.includes(currentUser.role)) {
+    if (!isPrivileged && targetStatus?.allowedRoles && targetStatus.allowedRoles.length > 0 && !targetStatus.allowedRoles.includes(currentUser.role)) {
       alert(`Unauthorized: Only users with roles [${targetStatus.allowedRoles.join(', ')}] can move tasks into the "${targetStatus.label}" state.`);
       return;
     }
@@ -325,6 +327,19 @@ const KanbanView: React.FC<{ projectId: string }> = ({ projectId }) => {
     setActiveColumnMenu(null);
   };
 
+  const handleAddColumn = () => {
+    const newName = prompt('Enter name for the new workflow column:');
+    if (!newName) return;
+
+    const newColumn: WorkflowStatus = {
+      id: newName.toLowerCase().replace(/\s+/g, '_'),
+      label: newName,
+      category: 'IN_PROGRESS'
+    };
+
+    updateProject(project.id, { workflow: [...project.workflow, newColumn] });
+  };
+
   return (
     <div className="flex flex-col h-full bg-slate-50/30 dark:bg-slate-900/10">
       {/* Board Controls */}
@@ -389,13 +404,15 @@ const KanbanView: React.FC<{ projectId: string }> = ({ projectId }) => {
                 <button 
                   onClick={() => setAddTaskStatus(col.id)}
                   className="p-1.5 text-slate-400 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-[var(--primary)] transition-all"
+                  title="Add Task to Column"
                 >
                   <Plus className="w-4 h-4" />
                 </button>
                 <div className="relative">
                   <button 
                     onClick={() => setActiveColumnMenu(activeColumnMenu === col.id ? null : col.id)}
-                    className={`p-1.5 rounded-xl transition-all ${activeColumnMenu === col.id ? 'bg-[var(--primary)]/10 text-[var(--primary)]' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-600'}`}
+                    className={`p-1.5 rounded-xl transition-all ${activeColumnMenu === col.id ? 'bg-[var(--primary)]/10 text-[var(--primary)] shadow-sm' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-600'}`}
+                    title="Column Actions"
                   >
                     <MoreVertical className="w-4 h-4" />
                   </button>
@@ -416,28 +433,34 @@ const KanbanView: React.FC<{ projectId: string }> = ({ projectId }) => {
                           >
                             <Plus className="w-4 h-4 text-slate-400 group-hover:text-[var(--primary)]" /> Add Task
                           </button>
-                          <button 
-                            onClick={() => handleRenameColumn(col.id)}
-                            className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-xl transition-colors text-left group"
-                          >
-                            <Edit2 className="w-4 h-4 text-slate-400 group-hover:text-[var(--primary)]" /> Edit Name
-                          </button>
-                          <button 
-                            onClick={() => handleSetWipLimit(col.id)}
-                            className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-xl transition-colors text-left group"
-                          >
-                            <Target className="w-4 h-4 text-slate-400 group-hover:text-[var(--primary)]" /> Set WIP Limit
-                          </button>
-                          <button 
-                            onClick={() => handleTogglePermissions(col.id)}
-                            className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-xl transition-colors text-left group"
-                          >
-                            {col.allowedRoles && col.allowedRoles.length > 0 ? (
-                              <><Unlock className="w-4 h-4 text-amber-500 group-hover:text-amber-600" /> Unlock Moves</>
-                            ) : (
-                              <><Lock className="w-4 h-4 text-slate-400 group-hover:text-amber-500" /> Restrict Moves</>
-                            )}
-                          </button>
+                          
+                          {isPrivileged && (
+                            <>
+                              <button 
+                                onClick={() => handleRenameColumn(col.id)}
+                                className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-xl transition-colors text-left group"
+                              >
+                                <Edit2 className="w-4 h-4 text-slate-400 group-hover:text-[var(--primary)]" /> Rename Column
+                              </button>
+                              <button 
+                                onClick={() => handleSetWipLimit(col.id)}
+                                className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-xl transition-colors text-left group"
+                              >
+                                <Target className="w-4 h-4 text-slate-400 group-hover:text-[var(--primary)]" /> Set WIP Limit
+                              </button>
+                              <button 
+                                onClick={() => handleTogglePermissions(col.id)}
+                                className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-xl transition-colors text-left group"
+                              >
+                                {col.allowedRoles && col.allowedRoles.length > 0 ? (
+                                  <><Unlock className="w-4 h-4 text-amber-500 group-hover:text-amber-600" /> Unlock Moves</>
+                                ) : (
+                                  <><Lock className="w-4 h-4 text-slate-400 group-hover:text-amber-500" /> Restrict Moves</>
+                                )}
+                              </button>
+                            </>
+                          )}
+                          
                           <div className="h-px bg-slate-100 dark:bg-slate-800 mx-2 my-1" />
                           <button 
                             onClick={() => handleArchiveAll(col.id)}
@@ -492,12 +515,25 @@ const KanbanView: React.FC<{ projectId: string }> = ({ projectId }) => {
               {projectTasks.filter(t => t.status === col.id).length === 0 && swimlaneType === 'NONE' && (
                 <div className="py-12 border-2 border-dashed border-[var(--border)] rounded-[32px] flex flex-col items-center justify-center text-slate-300 dark:text-slate-700">
                   <Plus className="w-8 h-8 mb-2 opacity-50" />
-                  <p className="text-[10px] font-black uppercase tracking-widest opacity-50">Drop tasks here</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest opacity-50 text-center">Empty Stage<br/>Drop mission here</p>
                 </div>
               )}
             </div>
           </div>
         ))}
+
+        {/* Add Column Button */}
+        {isPrivileged && (
+          <div className="w-80 shrink-0 flex flex-col group/column pt-12">
+             <button 
+              onClick={handleAddColumn}
+              className="py-12 border-2 border-dashed border-[var(--border)] rounded-[32px] flex flex-col items-center justify-center text-slate-400 hover:text-[var(--primary)] hover:border-[var(--primary)] hover:bg-[var(--primary)]/5 transition-all group"
+            >
+              <LayoutTemplate className="w-8 h-8 mb-3 opacity-50 group-hover:scale-110 transition-transform" />
+              <p className="text-[10px] font-black uppercase tracking-widest">New Workflow Column</p>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Task Details Modal */}
@@ -506,6 +542,7 @@ const KanbanView: React.FC<{ projectId: string }> = ({ projectId }) => {
           <TaskDetailsModal 
             taskId={selectedTaskId} 
             onClose={() => setSelectedTaskId(null)} 
+            onSelectTask={setSelectedTaskId}
           />
         )}
       </AnimatePresence>

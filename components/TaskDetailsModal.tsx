@@ -14,9 +14,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface TaskDetailsModalProps {
   taskId: string | null;
   onClose: () => void;
+  onSelectTask?: (id: string) => void;
 }
 
-const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({ taskId, onClose }) => {
+const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({ taskId, onClose, onSelectTask }) => {
   const { tasks, projects, users, updateTask, deleteTask, currentUser } = useApp();
   const task = tasks.find(t => t.id === taskId);
   const project = projects.find(p => p.id === task?.projectId);
@@ -224,13 +225,19 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({ taskId, onClose }) 
                   const target = tasks.find(t => t.id === link.targetTaskId);
                   if (!target) return null;
                   return (
-                    <div key={idx} className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-900 border border-[var(--border)] rounded-2xl hover:border-[var(--primary)] transition-all group">
-                      <div className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest shrink-0 ${
-                        link.type === 'BLOCKS' ? 'bg-rose-100 text-rose-600' : 
-                        link.type === 'BLOCKED_BY' ? 'bg-amber-100 text-amber-600' : 
-                        'bg-blue-100 text-blue-600'
+                    <div 
+                      key={idx} 
+                      onClick={() => onSelectTask?.(target.id)}
+                      className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-900 border border-[var(--border)] rounded-2xl hover:border-[var(--primary)] transition-all group cursor-pointer"
+                    >
+                      <div className={`p-2 rounded-xl shrink-0 ${
+                        link.type === 'BLOCKS' ? 'bg-rose-50 text-rose-500 dark:bg-rose-900/20' : 
+                        link.type === 'BLOCKED_BY' ? 'bg-amber-50 text-amber-500 dark:bg-amber-900/20' : 
+                        'bg-blue-50 text-blue-500 dark:bg-blue-900/20'
                       }`}>
-                        {link.type.replace('_', ' ')}
+                        {link.type === 'BLOCKS' && <ShieldAlert className="w-4 h-4" />}
+                        {link.type === 'BLOCKED_BY' && <Clock className="w-4 h-4" />}
+                        {link.type === 'RELATES_TO' && <GitBranch className="w-4 h-4" />}
                       </div>
                       <div className="flex-1 min-w-0 flex items-center gap-3">
                         <span className="text-[10px] font-black text-slate-400 uppercase shrink-0">{project.key}-{target.number}</span>
@@ -240,7 +247,10 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({ taskId, onClose }) 
                         {target.status.replace('_', ' ')}
                       </div>
                       <button 
-                        onClick={() => removeDependency(target.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeDependency(target.id);
+                        }}
                         className="p-1.5 text-slate-300 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-all"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -355,7 +365,7 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({ taskId, onClose }) 
                     <p className="text-sm font-black truncate">{assignee?.name}</p>
                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Active Member</p>
                   </div>
-                  <MoreVertical className="w-4 h-4 text-slate-300 group-hover:text-slate-500" />
+                  < MoreVertical className="w-4 h-4 text-slate-300 group-hover:text-slate-500" />
                 </div>
               </div>
 
