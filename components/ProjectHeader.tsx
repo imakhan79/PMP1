@@ -1,8 +1,9 @@
 
 import React from 'react';
-import { LayoutGrid, List, Calendar, GanttChartSquare, Info, Star, MoreHorizontal, Settings, Layers } from 'lucide-react';
+import { LayoutGrid, List, Calendar, Info, Star, MoreHorizontal, Settings, Layers, ChevronRight } from 'lucide-react';
 import { Project } from '../types';
 import { Link, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const ProjectHeader: React.FC<{ project: Project }> = ({ project }) => {
   const location = useLocation();
@@ -18,57 +19,72 @@ const ProjectHeader: React.FC<{ project: Project }> = ({ project }) => {
   ];
 
   return (
-    <div className="bg-white border-b border-slate-200 sticky top-0 z-10">
-      <div className="px-4 lg:px-6 pt-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 shrink-0 bg-indigo-100 text-indigo-700 rounded-lg flex items-center justify-center font-bold text-lg">
+    <div className="bg-[var(--surface)] border-b border-[var(--border)] sticky top-0 z-20">
+      <div className="px-6 lg:px-8 pt-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+          <div className="flex items-center gap-4 min-w-0">
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="w-12 h-12 shrink-0 bg-[var(--primary)] text-white rounded-2xl flex items-center justify-center font-black text-xl shadow-lg shadow-[var(--primary)]/20"
+            >
               {project.key}
-            </div>
+            </motion.div>
             <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <h1 className="text-lg lg:text-xl font-bold text-slate-900 truncate">{project.name}</h1>
-                <button className="text-slate-400 hover:text-yellow-400 shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                  <span>Projects</span>
+                  <ChevronRight className="w-3 h-3" />
+                </div>
+                <button className="text-slate-300 hover:text-amber-400 transition-colors">
                   <Star className="w-4 h-4" />
                 </button>
               </div>
-              <p className="text-xs text-slate-500 truncate">Workspace: Engineering Hub</p>
+              <h1 className="text-2xl font-black text-[var(--text)] truncate tracking-tight">{project.name}</h1>
             </div>
           </div>
-          <div className="flex items-center justify-between md:justify-end gap-2">
-            <div className="flex -space-x-2 mr-2">
-              {project.members.slice(0, 3).map((mId, i) => (
-                <img 
+          
+          <div className="flex items-center justify-between md:justify-end gap-4">
+            <div className="flex -space-x-3 hover:space-x-1 transition-all">
+              {project.members.slice(0, 4).map((mId, i) => (
+                <motion.img 
                   key={i} 
-                  src={`https://i.pravatar.cc/150?u=${mId}`} 
-                  className="w-7 h-7 lg:w-8 lg:h-8 rounded-full border-2 border-white ring-1 ring-slate-200" 
+                  whileHover={{ y: -4, zIndex: 10 }}
+                  src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${mId}`} 
+                  className="w-9 h-9 rounded-xl border-2 border-[var(--surface)] shadow-sm cursor-pointer" 
                   alt="member" 
                 />
               ))}
-              {project.members.length > 3 && (
-                <button className="w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-slate-50 border-2 border-white ring-1 ring-slate-200 flex items-center justify-center text-slate-400 text-[10px] font-medium">
-                  +{project.members.length - 3}
-                </button>
+              {project.members.length > 4 && (
+                <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 border-2 border-[var(--surface)] flex items-center justify-center text-slate-500 text-[10px] font-black shadow-sm">
+                  +{project.members.length - 4}
+                </div>
               )}
             </div>
-            <div className="h-6 w-px bg-slate-200 mx-1" />
-            <button className="p-2 hover:bg-slate-50 rounded-lg text-slate-400">
+            <div className="h-8 w-px bg-[var(--border)] mx-1" />
+            <button className="p-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-slate-400 transition-all">
               <MoreHorizontal className="w-5 h-5" />
             </button>
           </div>
         </div>
 
-        <div className="flex gap-4 lg:gap-6 overflow-x-auto custom-scrollbar -mx-4 px-4 lg:mx-0 lg:px-0">
+        <div className="flex gap-1 overflow-x-auto custom-scrollbar -mx-6 px-6 lg:mx-0 lg:px-0">
           {tabs.map((tab) => {
             const isActive = path === tab.href;
             return (
               <Link
                 key={tab.label}
                 to={tab.href}
-                className={`flex items-center gap-2 pb-3 px-1 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${isActive ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-900 hover:border-slate-300'}`}
+                className={`group relative flex items-center gap-2.5 pb-4 pt-1 px-4 text-sm font-bold whitespace-nowrap transition-colors ${isActive ? 'text-[var(--primary)]' : 'text-slate-500 hover:text-[var(--text)]'}`}
               >
-                <tab.icon className="w-4 h-4" />
+                <tab.icon className={`w-4 h-4 transition-transform group-hover:scale-110 ${isActive ? 'text-[var(--primary)]' : 'text-slate-400'}`} />
                 {tab.label}
+                {isActive && (
+                  <motion.div 
+                    layoutId="header-tabs"
+                    className="absolute bottom-0 left-0 right-0 h-1 bg-[var(--primary)] rounded-t-full shadow-[0_-4px_10px_rgba(var(--primary-rgb),0.3)]"
+                  />
+                )}
               </Link>
             );
           })}

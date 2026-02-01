@@ -1,7 +1,8 @@
 
 import React, { useState } from 'react';
-import { X, Hash, Info, User } from 'lucide-react';
+import { X, Hash, Info, User, Briefcase, Sparkles } from 'lucide-react';
 import { useApp } from '../store';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface CreateProjectModalProps {
   isOpen: boolean;
@@ -44,71 +45,92 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
-      <div 
-        className="bg-white w-full max-w-lg rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200"
+    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="fixed inset-0 bg-slate-900/60 backdrop-blur-lg"
+      />
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95, y: 30 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 30 }}
+        className="bg-[var(--surface)] w-full max-w-xl rounded-[48px] shadow-3xl flex flex-col overflow-hidden z-10 border border-[var(--border)] relative"
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-          <h2 className="text-lg font-bold text-slate-900">New Project</h2>
-          <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 rounded-full">
-            <X className="w-5 h-5" />
+        <div className="flex items-center justify-between px-10 py-8 border-b border-[var(--border)] bg-slate-50/50 dark:bg-slate-950/20">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-indigo-500 text-white rounded-2xl flex items-center justify-center shadow-xl shadow-indigo-500/20">
+              <Briefcase className="w-6 h-6" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-black tracking-tight">New Project</h2>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-0.5">Initialize a new workstream</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="p-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-all">
+            <X className="w-6 h-6" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-500 uppercase">Project Name</label>
+        <form onSubmit={handleSubmit} className="p-10 space-y-8">
+          <div className="space-y-3">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Project Identity</label>
             <input
               autoFocus
               type="text"
-              placeholder="e.g. Mobile Redesign"
+              placeholder="e.g. Next-Gen Mobile Platform"
               value={name}
               onChange={(e) => handleNameChange(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+              className="w-full bg-slate-50 dark:bg-slate-900 border border-[var(--border)] rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all shadow-inner"
               required
             />
           </div>
 
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-500 uppercase">Project Key</label>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between ml-1">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Unique Project Key</label>
+              <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+            </div>
             <div className="relative">
-              <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Hash className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
                 maxLength={5}
                 placeholder="KEY"
                 value={key}
                 onChange={(e) => setKey(e.target.value.toUpperCase())}
-                className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                className="w-full pl-12 pr-6 py-4 bg-slate-50 dark:bg-slate-900 border border-[var(--border)] rounded-2xl text-sm font-black uppercase tracking-widest focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all shadow-inner"
                 required
               />
             </div>
-            <p className="text-[10px] text-slate-400">Unique short identifier for tasks (e.g. PROJ-1)</p>
+            <p className="text-[10px] text-slate-400 font-bold ml-1">This ID will prefix all tasks in the project.</p>
           </div>
 
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-500 uppercase">Description</label>
+          <div className="space-y-3">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Vision & Scope</label>
             <textarea
-              placeholder="What is this project about?"
+              placeholder="Describe the high-level goals and requirements..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              rows={3}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none"
+              rows={4}
+              className="w-full bg-slate-50 dark:bg-slate-900 border border-[var(--border)] rounded-3xl px-6 py-4 text-sm font-medium focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all resize-none shadow-inner leading-relaxed"
             />
           </div>
         </form>
 
-        <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3">
-          <button onClick={onClose} className="text-sm font-semibold text-slate-600">Cancel</button>
+        <div className="px-10 py-8 bg-slate-50 dark:bg-slate-950/40 border-t border-[var(--border)] flex items-center justify-end gap-6">
+          <button onClick={onClose} className="text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-700 transition-colors">Dismiss</button>
           <button
             onClick={handleSubmit}
             disabled={!name || !key}
-            className="px-6 py-2 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 disabled:opacity-50 transition-all"
+            className="px-12 py-4 bg-indigo-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-2xl shadow-indigo-600/30 hover:brightness-110 active:scale-95 disabled:opacity-50 transition-all"
           >
-            Create Project
+            Launch Project
           </button>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

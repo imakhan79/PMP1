@@ -1,5 +1,7 @@
 
 export type UserRole = 'OWNER' | 'ADMIN' | 'MEMBER' | 'VIEWER';
+export type ThemeMode = 'light' | 'dark';
+export type AccentColor = 'ocean' | 'aurora' | 'forest' | 'ember' | 'slate' | 'sunrise';
 
 export interface User {
   id: string;
@@ -20,6 +22,9 @@ export interface Workspace {
   settings: {
     workingDays: number[];
     defaultTimezone: string;
+    theme: ThemeMode;
+    accent: AccentColor;
+    reduceMotion: boolean;
   };
 }
 
@@ -31,6 +36,7 @@ export interface WorkflowStatus {
   label: string;
   category: 'TODO' | 'IN_PROGRESS' | 'DONE';
   wipLimit?: number;
+  allowedRoles?: UserRole[]; // New field for RBAC transitions
 }
 
 export interface Project {
@@ -46,7 +52,7 @@ export interface Project {
   issueTypes: IssueType[];
 }
 
-export type TaskStatus = string; // Now dynamic based on project workflow
+export type TaskStatus = string;
 export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
 
 export interface IssueLink {
@@ -67,7 +73,7 @@ export interface Task {
   assigneeId?: string;
   reporterId: string;
   dueDate?: string;
-  estimate?: number; // Story points
+  estimate?: number; 
   originalEstimateHours?: number;
   remainingEstimateHours?: number;
   labels: string[];
@@ -86,14 +92,14 @@ export interface Sprint {
   startDate: string;
   endDate: string;
   status: 'PLANNED' | 'ACTIVE' | 'COMPLETED';
-  capacity?: Record<string, number>; // userId -> hours
+  capacity?: Record<string, number>;
 }
 
 export interface TimeEntry {
   id: string;
   taskId: string;
   userId: string;
-  duration: number; // minutes
+  duration: number;
   date: string;
   description?: string;
   isBillable: boolean;

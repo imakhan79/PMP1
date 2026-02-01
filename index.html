@@ -8,40 +8,70 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
     <style>
+      :root {
+        --font-outfit: 'Outfit', sans-serif;
+        --font-inter: 'Inter', sans-serif;
+      }
       body {
-        font-family: 'Inter', sans-serif;
-        background-color: #f9fafb;
+        font-family: var(--font-inter);
+        background-color: var(--bg);
+        color: var(--text);
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+      h1, h2, h3, h4, button {
+        font-family: var(--font-outfit);
       }
       .custom-scrollbar::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
+        width: 5px;
+        height: 5px;
       }
       .custom-scrollbar::-webkit-scrollbar-track {
         background: transparent;
       }
       .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #e5e7eb;
-        border-radius: 3px;
+        background: rgba(0,0,0,0.1);
+        border-radius: 10px;
       }
       .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: #d1d5db;
+        background: rgba(0,0,0,0.2);
       }
+      .glass {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+      .dark .glass {
+        background: rgba(15, 23, 42, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      /* Theme Palettes */
+      [data-theme='light'] { --bg: #f8fafc; --surface: #ffffff; --text: #0f172a; --muted: #64748b; --border: #e2e8f0; }
+      [data-theme='dark'] { --bg: #020617; --surface: #0f172a; --text: #f8fafc; --muted: #94a3b8; --border: #1e293b; }
+      
+      [data-accent='ocean'] { --primary: #0ea5e9; --primary-hover: #0284c7; }
+      [data-accent='aurora'] { --primary: #d946ef; --primary-hover: #c026d3; }
+      [data-accent='forest'] { --primary: #10b981; --primary-hover: #059669; }
+      [data-accent='ember'] { --primary: #f43f5e; --primary-hover: #e11d48; }
+      [data-accent='slate'] { --primary: #475569; --primary-hover: #334155; }
+      [data-accent='sunrise'] { --primary: #f59e0b; --primary-hover: #d97706; }
     </style>
-  <script type="importmap">
-{
-  "imports": {
-    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
-    "react-router-dom": "https://esm.sh/react-router-dom@^7.13.0",
-    "react/": "https://esm.sh/react@^19.2.4/",
-    "react": "https://esm.sh/react@^19.2.4",
-    "recharts": "https://esm.sh/recharts@^3.7.0",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.4/"
-  }
-}
-</script>
-</head>
+    <script type="importmap">
+    {
+      "imports": {
+        "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+        "react-router-dom": "https://esm.sh/react-router-dom@^7.13.0",
+        "react/": "https://esm.sh/react@^19.2.4/",
+        "react": "https://esm.sh/react@^19.2.4",
+        "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+        "recharts": "https://esm.sh/recharts@^3.7.0",
+        "framer-motion": "https://esm.sh/framer-motion@^11.0.0"
+      }
+    }
+    </script>
+  </head>
   <body class="overflow-hidden">
     <div id="root"></div>
   </body>

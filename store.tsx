@@ -2,7 +2,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { 
   User, Workspace, Project, Task, Sprint, 
-  TimeEntry, Comment, WikiPage, Notification, AuditLog, WorkflowStatus
+  TimeEntry, Comment, WikiPage, Notification, AuditLog, WorkflowStatus,
+  ThemeMode, AccentColor
 } from './types';
 
 interface AppState {
@@ -30,6 +31,7 @@ interface AppContextType extends AppState {
   markNotificationAsRead: (id: string) => void;
   createWikiPage: (page: Partial<WikiPage>) => void;
   updateWikiPage: (id: string, updates: Partial<WikiPage>) => void;
+  updateWorkspaceSettings: (updates: Partial<Workspace['settings']>) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -39,7 +41,7 @@ const DEFAULT_WORKFLOW: WorkflowStatus[] = [
   { id: 'todo', label: 'To Do', category: 'TODO' },
   { id: 'in_progress', label: 'In Progress', category: 'IN_PROGRESS', wipLimit: 5 },
   { id: 'review', label: 'Review', category: 'IN_PROGRESS', wipLimit: 3 },
-  { id: 'done', label: 'Done', category: 'DONE' }
+  { id: 'done', label: 'Done', category: 'DONE', allowedRoles: ['ADMIN', 'OWNER'] }
 ];
 
 const INITIAL_DATA: AppState = {
@@ -59,7 +61,10 @@ const INITIAL_DATA: AppState = {
     ownerId: 'u1',
     settings: {
       workingDays: [1, 2, 3, 4, 5],
-      defaultTimezone: 'UTC'
+      defaultTimezone: 'UTC',
+      theme: 'light',
+      accent: 'ocean',
+      reduceMotion: false,
     }
   },
   users: [
@@ -96,13 +101,31 @@ const INITIAL_DATA: AppState = {
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, setState] = useState<AppState>(() => {
-    const saved = localStorage.getItem('aslam_pm_enterprise_state');
+    const saved = localStorage.getItem('aslam_pm_premium_state');
     return saved ? JSON.parse(saved) : INITIAL_DATA;
   });
 
   useEffect(() => {
-    localStorage.setItem('aslam_pm_enterprise_state', JSON.stringify(state));
+    localStorage.setItem('aslam_pm_premium_state', JSON.stringify(state));
+    // Apply theme to document body
+    document.documentElement.setAttribute('data-theme', state.workspace.settings.theme);
+    document.documentElement.setAttribute('data-accent', state.workspace.settings.accent);
+    if (state.workspace.settings.theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   }, [state]);
+
+  const updateWorkspaceSettings = useCallback((updates: Partial<Workspace['settings']>) => {
+    setState(prev => ({
+      ...prev,
+      workspace: {
+        ...prev.workspace,
+        settings: { ...prev.workspace.settings, ...updates }
+      }
+    }));
+  }, []);
 
   const addTask = useCallback((task: Partial<Task>) => {
     setState(prev => {
@@ -120,17 +143,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, []);
 
   const updateTask = useCallback((id: string, updates: Partial<Task>) => {
-    setState(prev => {
-      const updatedTasks = prev.tasks.map(t => {
-        if (t.id === id) {
-          const newStatus = updates.status || t.status;
-          const completedAt = newStatus === 'done' ? new Date().toISOString() : (newStatus !== t.status ? undefined : t.completedAt);
-          return { ...t, ...updates, completedAt, updatedAt: new Date().toISOString() };
-        }
-        return t;
-      });
-      return { ...prev, tasks: updatedTasks };
-    });
+    setState(prev => ({
+      ...prev,
+      tasks: prev.tasks.map(t => t.id === id ? { ...t, ...updates, updatedAt: new Date().toISOString() } : t)
+    }));
   }, []);
 
   const deleteTask = useCallback((id: string) => {
@@ -203,7 +219,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     addTimeEntry,
     markNotificationAsRead,
     createWikiPage,
-    updateWikiPage
+    updateWikiPage,
+    updateWorkspaceSettings
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
