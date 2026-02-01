@@ -1,11 +1,34 @@
-<div align="center">
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+# Aslam PM - Modern Project Management SaaS
 
-  <h1>Built with AI Studio</h2>
+Aslam PM is a high-performance, developer-centric project management tool built with speed and aesthetics in mind.
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+## Core Features
+- **Multitenancy**: Workspaces with complete isolation.
+- **Dynamic Views**: Kanban, List, Calendar, and Timeline.
+- **Sprint Management**: Built-in support for Agile workflows.
+- **Reporting**: Advanced dashboards for workload and velocity tracking.
+- **Wiki/Docs**: Project-specific knowledge bases.
+- **Time Tracking**: Log hours directly on tasks.
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+## Tech Stack
+- **Frontend**: React 18, TypeScript, Tailwind CSS.
+- **Icons**: Lucide-react.
+- **Charts**: Recharts.
+- **Storage**: LocalStorage (Simulated PostgreSQL/Prisma backend for this environment).
 
-</div>
+## Architecture
+The application uses a **Service-Store** pattern. All mutations flow through the `AppProvider` which simulates server-side validations and Prisma database logic. RBAC is enforced at the service level.
+
+### Permission Matrix
+| Action | Owner | Admin | Member | Viewer |
+| :--- | :---: | :---: | :---: | :---: |
+| Delete Workspace | ✅ | ❌ | ❌ | ❌ |
+| Invite Users | ✅ | ✅ | ❌ | ❌ |
+| Create Projects | ✅ | ✅ | ✅ | ❌ |
+| Edit Tasks | ✅ | ✅ | ✅ | ❌ |
+| View Reports | ✅ | ✅ | ✅ | ✅ |
+
+## Setup
+1. Standard React installation: `npm install && npm start`.
+2. The `store.tsx` handles initial seeding (1 workspace, 2 projects, 20 tasks).
