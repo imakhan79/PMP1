@@ -1,9 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { X, Calendar, Flag, Hash, AlignLeft, CheckCircle2, ChevronRight, Zap } from 'lucide-react';
+import { X, Calendar, Flag, Hash, AlignLeft, CheckCircle2, ChevronRight, Zap, Target, Layers } from 'lucide-react';
 import { useApp } from '../store';
 import { TaskPriority, TaskStatus } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 interface CreateTaskModalProps {
   isOpen: boolean;
@@ -14,6 +15,7 @@ interface CreateTaskModalProps {
 
 const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClose, initialStatus, initialProjectId }) => {
   const { projects, addTask, currentUser } = useApp();
+  const navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [projectId, setProjectId] = useState(initialProjectId || projects[0]?.id || '');
   const [priority, setPriority] = useState<TaskPriority>('MEDIUM');
@@ -21,7 +23,6 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClose, init
   const [dueDate, setDueDate] = useState('');
   const [description, setDescription] = useState('');
 
-  // Sync state if initial props change while open or when opening
   useEffect(() => {
     if (isOpen) {
       if (initialStatus) setStatus(initialStatus);
@@ -51,7 +52,10 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClose, init
     setTitle('');
     setDescription('');
     onClose();
+    navigate(`/projects/${projectId}`);
   };
+
+  const currentProject = projects.find(p => p.id === projectId);
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -66,134 +70,162 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClose, init
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-        className="bg-[var(--surface)] w-full max-w-2xl rounded-[40px] shadow-2xl flex flex-col overflow-hidden z-10 border border-[var(--border)]"
+        className="bg-[var(--surface)] w-full max-w-3xl rounded-[48px] shadow-3xl flex flex-col overflow-hidden z-10 border border-[var(--border)]"
         role="dialog"
       >
-        <div className="flex items-center justify-between px-8 py-6 border-b border-[var(--border)] bg-slate-50/30 dark:bg-slate-950/20">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-[var(--primary)] text-white rounded-xl flex items-center justify-center shadow-lg shadow-[var(--primary)]/20">
-              <Zap className="w-5 h-5 fill-white" />
+        <div className="flex items-center justify-between px-10 py-8 border-b border-[var(--border)] bg-slate-50/30 dark:bg-slate-950/20">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 bg-gradient-to-br from-[var(--primary)] to-indigo-600 text-white rounded-2xl flex items-center justify-center shadow-2xl shadow-[var(--primary)]/30">
+              <Zap className="w-7 h-7 fill-white" />
             </div>
-            <h2 className="text-xl font-black tracking-tight">New Mission</h2>
+            <div>
+              <h2 className="text-2xl font-black tracking-tight text-[var(--text)]">Launch Mission</h2>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-0.5">Define a new work package</p>
+            </div>
           </div>
           <button 
             onClick={onClose}
-            className="p-2.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all"
+            className="p-3 text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-all"
           >
-            <X className="w-5 h-5" />
+            <X className="w-6 h-6" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-8 lg:p-10 space-y-10 custom-scrollbar">
-          <div className="space-y-3">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Task Identification</label>
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-10 lg:p-12 space-y-12 custom-scrollbar">
+          {/* Section 1: Core Info */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 text-[10px] font-black text-[var(--primary)] uppercase tracking-widest ml-1">
+              <Target className="w-4 h-4" /> Identification
+            </div>
             <input
               autoFocus
               type="text"
-              placeholder="Give this task a compelling title..."
+              placeholder="What needs to be achieved?"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full text-3xl font-black text-[var(--text)] placeholder:text-slate-100 dark:placeholder:text-slate-900 border-none p-0 focus:ring-0 outline-none tracking-tight leading-tight"
+              className="w-full text-4xl font-black text-[var(--text)] placeholder:text-slate-200 dark:placeholder:text-slate-800 border-none p-0 focus:ring-0 outline-none tracking-tight leading-tight bg-transparent"
               required
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            {/* Project Context */}
+            <div className="space-y-4">
               <label className="flex items-center gap-3 text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
-                <Hash className="w-3.5 h-3.5" /> Context
+                <Hash className="w-4 h-4 text-indigo-500" /> Context
               </label>
-              <select
-                value={projectId}
-                onChange={(e) => setProjectId(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-slate-900 border border-[var(--border)] rounded-2xl px-5 py-3 text-sm font-bold focus:ring-4 focus:ring-[var(--primary)]/10 outline-none transition-all appearance-none cursor-pointer"
-                required
-              >
-                {projects.map(p => (
-                  <option key={p.id} value={p.id}>{p.name}</option>
-                ))}
-              </select>
+              <div className="relative group">
+                <select
+                  value={projectId}
+                  onChange={(e) => setProjectId(e.target.value)}
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-[var(--border)] rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-[var(--primary)]/10 outline-none transition-all appearance-none cursor-pointer shadow-inner pr-12 group-hover:border-[var(--primary)]/50"
+                  required
+                >
+                  {projects.map(p => (
+                    <option key={p.id} value={p.id}>{p.name}</option>
+                  ))}
+                </select>
+                <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300">
+                  <ChevronRight className="w-5 h-5 rotate-90" />
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-3">
+            {/* Criticality */}
+            <div className="space-y-4">
               <label className="flex items-center gap-3 text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
-                <Flag className="w-3.5 h-3.5" /> Criticality
+                <Flag className="w-4 h-4 text-rose-500" /> Criticality
               </label>
-              <select
-                value={priority}
-                onChange={(e) => setPriority(e.target.value as TaskPriority)}
-                className="w-full bg-slate-50 dark:bg-slate-900 border border-[var(--border)] rounded-2xl px-5 py-3 text-sm font-bold focus:ring-4 focus:ring-[var(--primary)]/10 outline-none transition-all appearance-none cursor-pointer"
-              >
-                <option value="LOW">Low priority</option>
-                <option value="MEDIUM">Standard</option>
-                <option value="HIGH">High priority</option>
-                <option value="URGENT">Urgent mission</option>
-              </select>
+              <div className="relative group">
+                <select
+                  value={priority}
+                  onChange={(e) => setPriority(e.target.value as TaskPriority)}
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-[var(--border)] rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-[var(--primary)]/10 outline-none transition-all appearance-none cursor-pointer shadow-inner pr-12 group-hover:border-[var(--primary)]/50"
+                >
+                  <option value="LOW">Low priority</option>
+                  <option value="MEDIUM">Standard</option>
+                  <option value="HIGH">High priority</option>
+                  <option value="URGENT">Urgent mission</option>
+                </select>
+                <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300">
+                  <ChevronRight className="w-5 h-5 rotate-90" />
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-3">
+            {/* Date */}
+            <div className="space-y-4">
               <label className="flex items-center gap-3 text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
-                <Calendar className="w-3.5 h-3.5" /> Target Date
+                <Calendar className="w-4 h-4 text-amber-500" /> Target Date
               </label>
               <input
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-slate-900 border border-[var(--border)] rounded-2xl px-5 py-3 text-sm font-bold focus:ring-4 focus:ring-[var(--primary)]/10 outline-none transition-all cursor-pointer"
+                className="w-full bg-slate-50 dark:bg-slate-900 border border-[var(--border)] rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-[var(--primary)]/10 outline-none transition-all cursor-pointer shadow-inner hover:border-[var(--primary)]/50"
               />
             </div>
 
-            <div className="space-y-3">
+            {/* Workflow State */}
+            <div className="space-y-4">
               <label className="flex items-center gap-3 text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
-                <CheckCircle2 className="w-3.5 h-3.5" /> Initial State
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Initial State
               </label>
-              <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value as TaskStatus)}
-                className="w-full bg-slate-50 dark:bg-slate-900 border border-[var(--border)] rounded-2xl px-5 py-3 text-sm font-bold focus:ring-4 focus:ring-[var(--primary)]/10 outline-none transition-all appearance-none cursor-pointer"
-              >
-                {projects.find(p => p.id === projectId)?.workflow.map(w => (
-                  <option key={w.id} value={w.id}>{w.label}</option>
-                )) || (
-                  <>
-                    <option value="backlog">Backlog</option>
-                    <option value="todo">To Do</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="done">Done</option>
-                  </>
-                )}
-              </select>
+              <div className="relative group">
+                <select
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value as TaskStatus)}
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-[var(--border)] rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-[var(--primary)]/10 outline-none transition-all appearance-none cursor-pointer shadow-inner pr-12 group-hover:border-[var(--primary)]/50"
+                >
+                  {currentProject?.workflow.map(w => (
+                    <option key={w.id} value={w.id}>{w.label}</option>
+                  )) || (
+                    <>
+                      <option value="backlog">Backlog</option>
+                      <option value="todo">To Do</option>
+                      <option value="in_progress">In Progress</option>
+                      <option value="done">Done</option>
+                    </>
+                  )}
+                </select>
+                <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300">
+                  <ChevronRight className="w-5 h-5 rotate-90" />
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             <label className="flex items-center gap-3 text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
-              <AlignLeft className="w-3.5 h-3.5" /> Mission Brief
+              <AlignLeft className="w-4 h-4 text-[var(--primary)]" /> Mission Brief
             </label>
             <textarea
-              placeholder="Expand on the requirements and scope of this task..."
+              placeholder="Expand on the requirements, scope, and technical details..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={5}
-              className="w-full bg-slate-50 dark:bg-slate-900 border border-[var(--border)] rounded-3xl px-6 py-4 text-sm font-medium focus:ring-4 focus:ring-[var(--primary)]/10 outline-none transition-all resize-none leading-relaxed"
+              className="w-full bg-slate-50 dark:bg-slate-900 border border-[var(--border)] rounded-[32px] px-8 py-6 text-sm font-medium focus:ring-4 focus:ring-[var(--primary)]/10 outline-none transition-all resize-none leading-relaxed shadow-inner hover:border-[var(--primary)]/50"
             />
           </div>
         </form>
 
-        <div className="px-10 py-6 bg-slate-50 dark:bg-slate-950/40 border-t border-[var(--border)] flex items-center justify-between gap-4">
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Saved automatically</p>
-          <div className="flex items-center gap-4">
+        <div className="px-12 py-8 bg-slate-50 dark:bg-slate-950/40 border-t border-[var(--border)] flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">System Ready</p>
+          </div>
+          <div className="flex items-center gap-6">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-3 text-xs font-black uppercase tracking-widest text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
+              className="text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
             >
-              Cancel
+              Discard
             </button>
             <button
               onClick={handleSubmit}
               disabled={!title}
-              className="px-10 py-3 bg-[var(--primary)] text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-2xl shadow-[var(--primary)]/25 hover:brightness-110 active:scale-95 disabled:opacity-50 disabled:shadow-none transition-all"
+              className="px-12 py-4 bg-gradient-to-br from-[var(--primary)] to-indigo-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-2xl shadow-[var(--primary)]/30 hover:brightness-110 active:scale-95 disabled:opacity-50 disabled:shadow-none transition-all"
             >
               Launch Task
             </button>

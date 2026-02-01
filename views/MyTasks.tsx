@@ -16,6 +16,7 @@ import {
   Layout
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 const StatusIcon: React.FC<{ status: TaskStatus; onClick?: () => void }> = ({ status, onClick }) => {
   const s = status.toUpperCase();
@@ -26,7 +27,7 @@ const StatusIcon: React.FC<{ status: TaskStatus; onClick?: () => void }> = ({ st
     REVIEW: <AlertCircle className="w-5 h-5 text-amber-500" />,
     DONE: <CheckCircle2 className="w-5 h-5 text-emerald-500" />,
   };
-  return <button onClick={onClick} className="hover:scale-125 transition-transform active:scale-95">{icons[s] || icons.TODO}</button>;
+  return <button onClick={(e) => { e.stopPropagation(); onClick?.(); }} className="hover:scale-125 transition-transform active:scale-95">{icons[s] || icons.TODO}</button>;
 };
 
 const PriorityTag: React.FC<{ priority: TaskPriority }> = ({ priority }) => {
@@ -45,6 +46,7 @@ const PriorityTag: React.FC<{ priority: TaskPriority }> = ({ priority }) => {
 
 const MyTasks: React.FC = () => {
   const { tasks, currentUser, projects, updateTask } = useApp();
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState<'ACTIVE' | 'DONE' | 'ALL'>('ACTIVE');
 
@@ -69,6 +71,10 @@ const MyTasks: React.FC = () => {
       ? statusOrder[0] 
       : statusOrder[currentIndex + 1];
     updateTask(task.id, { status: nextStatus });
+  };
+
+  const handleTaskClick = (task: Task) => {
+    navigate(`/projects/${task.projectId}`);
   };
 
   if (!currentUser) return null;
@@ -148,7 +154,8 @@ const MyTasks: React.FC = () => {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="group bg-[var(--surface)] p-5 rounded-3xl border border-[var(--border)] shadow-sm hover:shadow-xl hover:shadow-slate-200/40 dark:hover:shadow-black/40 transition-all flex flex-col md:flex-row md:items-center gap-6"
+                  onClick={() => handleTaskClick(task)}
+                  className="group bg-[var(--surface)] p-5 rounded-3xl border border-[var(--border)] shadow-sm hover:shadow-xl hover:shadow-slate-200/40 dark:hover:shadow-black/40 transition-all flex flex-col md:flex-row md:items-center gap-6 cursor-pointer"
                 >
                   <div className="flex items-center gap-5 flex-1 min-w-0">
                     <StatusIcon status={task.status} onClick={() => handleToggleStatus(task)} />
@@ -181,7 +188,10 @@ const MyTasks: React.FC = () => {
                       </div>
                     </div>
 
-                    <button className="p-2 rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-[var(--primary)] transition-all">
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); }}
+                      className="p-2 rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-[var(--primary)] transition-all"
+                    >
                       <MoreHorizontal className="w-5 h-5" />
                     </button>
                   </div>
