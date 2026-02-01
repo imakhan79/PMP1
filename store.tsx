@@ -71,11 +71,13 @@ const INITIAL_DATA: AppState = {
   users: [
     { id: 'u1', name: 'Aslam Admin', email: 'admin@aslam.pm', timezone: 'UTC', status: 'ACTIVE', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Aslam', emailVerified: true, createdAt: new Date().toISOString() },
     { id: 'u2', name: 'Jane Dev', email: 'jane@aslam.pm', timezone: 'UTC', status: 'ACTIVE', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jane', emailVerified: true, createdAt: new Date().toISOString() },
-    { id: 'u3', name: 'Bob Product', email: 'bob@aslam.pm', timezone: 'UTC', status: 'ACTIVE', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Bob', emailVerified: true, createdAt: new Date().toISOString() }
+    { id: 'u3', name: 'Bob Product', email: 'bob@aslam.pm', timezone: 'UTC', status: 'ACTIVE', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Bob', emailVerified: true, createdAt: new Date().toISOString() },
+    { id: 'u4', name: 'Sarah Designer', email: 'sarah@aslam.pm', timezone: 'UTC', status: 'ACTIVE', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah', emailVerified: true, createdAt: new Date().toISOString() },
+    { id: 'u5', name: 'Mike QA', email: 'mike@aslam.pm', timezone: 'UTC', status: 'ACTIVE', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mike', emailVerified: true, createdAt: new Date().toISOString() }
   ],
   workspaces: [
     { 
-      id: 'w1', name: 'Engineering Hub', slug: 'eng-hub', ownerId: 'u1', status: 'ACTIVE', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+      id: 'w1', name: 'Aslam PM Global', slug: 'aslam-global', ownerId: 'u1', status: 'ACTIVE', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
       branding: { primaryColor: 'ocean', surfaceStyle: 'glass' },
       localization: { timezone: 'UTC', dateFormat: 'MMM d, yyyy', timeFormat: '24h', weekStartDay: 1 },
       settings: { theme: 'light', accent: 'ocean', reduceMotion: false }
@@ -84,18 +86,20 @@ const INITIAL_DATA: AppState = {
   memberships: [
     { workspaceId: 'w1', userId: 'u1', role: 'OWNER', status: 'ACTIVE', joinedAt: new Date().toISOString() },
     { workspaceId: 'w1', userId: 'u2', role: 'MEMBER', status: 'ACTIVE', joinedAt: new Date().toISOString() },
-    { workspaceId: 'w1', userId: 'u3', role: 'ADMIN', status: 'ACTIVE', joinedAt: new Date().toISOString() }
+    { workspaceId: 'w1', userId: 'u3', role: 'ADMIN', status: 'ACTIVE', joinedAt: new Date().toISOString() },
+    { workspaceId: 'w1', userId: 'u4', role: 'MEMBER', status: 'ACTIVE', joinedAt: new Date().toISOString() },
+    { workspaceId: 'w1', userId: 'u5', role: 'MEMBER', status: 'ACTIVE', joinedAt: new Date().toISOString() }
   ],
   plans: [
-    { workspaceId: 'w1', plan: 'PRO', status: 'ACTIVE', maxMembers: 20, maxProjects: 15, storageQuotaGb: 10 }
+    { workspaceId: 'w1', plan: 'BUSINESS', status: 'ACTIVE', maxMembers: 100, maxProjects: 50, storageQuotaGb: 100 }
   ],
   usage: [
-    { workspaceId: 'w1', membersCount: 3, projectsCount: 2, storageBytes: 512 * 1024 * 1024 }
+    { workspaceId: 'w1', membersCount: 5, projectsCount: 6, storageBytes: 1024 * 1024 * 1024 * 4 }
   ],
   invites: [],
   projects: [
     { 
-      id: 'p1', workspaceId: 'w1', name: 'Mobile App Revamp', key: 'MAR', status: 'ACTIVE', leadId: 'u1', members: ['u1', 'u2', 'u3'], taskTypes: ['STORY', 'BUG', 'TASK'],
+      id: 'p1', workspaceId: 'w1', name: 'Mobile App Revamp', key: 'MAR', status: 'ACTIVE', leadId: 'u1', members: ['u1', 'u2', 'u3', 'u4'], taskTypes: ['STORY', 'BUG', 'TASK'],
       workflow: [
         { id: 'todo', label: 'To Do', category: 'TODO' },
         { id: 'in_progress', label: 'In Progress', category: 'IN_PROGRESS' },
@@ -104,60 +108,132 @@ const INITIAL_DATA: AppState = {
       ]
     },
     { 
-      id: 'p2', workspaceId: 'w1', name: 'Backend Infrastructure', key: 'INF', status: 'ACTIVE', leadId: 'u2', members: ['u1', 'u2'], taskTypes: ['STORY', 'BUG', 'TASK'],
+      id: 'p2', workspaceId: 'w1', name: 'Cloud Infrastructure', key: 'CLD', status: 'ACTIVE', leadId: 'u2', members: ['u1', 'u2', 'u5'], taskTypes: ['STORY', 'BUG', 'TASK'],
       workflow: [
         { id: 'todo', label: 'Backlog', category: 'TODO' },
         { id: 'in_progress', label: 'Developing', category: 'IN_PROGRESS' },
         { id: 'done', label: 'Deployed', category: 'DONE' }
       ]
+    },
+    { 
+      id: 'p3', workspaceId: 'w1', name: 'Marketing Web 2025', key: 'MKT', status: 'ACTIVE', leadId: 'u4', members: ['u1', 'u4', 'u3'], taskTypes: ['TASK', 'STORY'],
+      workflow: [
+        { id: 'todo', label: 'Next Up', category: 'TODO' },
+        { id: 'in_progress', label: 'Building', category: 'IN_PROGRESS' },
+        { id: 'done', label: 'Live', category: 'DONE' }
+      ]
+    },
+    { 
+      id: 'p4', workspaceId: 'w1', name: 'Support Portal', key: 'SUP', status: 'ACTIVE', leadId: 'u3', members: ['u3', 'u2', 'u5'], taskTypes: ['BUG', 'TASK'],
+      workflow: [
+        { id: 'todo', label: 'Triage', category: 'TODO' },
+        { id: 'in_progress', label: 'Fixing', category: 'IN_PROGRESS' },
+        { id: 'done', label: 'Resolved', category: 'DONE' }
+      ]
+    },
+    { 
+      id: 'p5', workspaceId: 'w1', name: 'AI Integration Engine', key: 'AIE', status: 'ACTIVE', leadId: 'u1', members: ['u1', 'u2', 'u3', 'u4', 'u5'], taskTypes: ['STORY', 'EPIC', 'TASK'],
+      workflow: [
+        { id: 'todo', label: 'Analysis', category: 'TODO' },
+        { id: 'in_progress', label: 'Training', category: 'IN_PROGRESS' },
+        { id: 'testing', label: 'Testing', category: 'IN_PROGRESS' },
+        { id: 'done', label: 'Production', category: 'DONE' }
+      ]
+    },
+    { 
+      id: 'p6', workspaceId: 'w1', name: 'Security Audit 2.0', key: 'SEC', status: 'ACTIVE', leadId: 'u5', members: ['u5', 'u1', 'u2'], taskTypes: ['TASK', 'BUG'],
+      workflow: [
+        { id: 'todo', label: 'Identify', category: 'TODO' },
+        { id: 'in_progress', label: 'Patching', category: 'IN_PROGRESS' },
+        { id: 'done', label: 'Certified', category: 'DONE' }
+      ]
     }
   ],
-  tasks: Array.from({ length: 20 }).map((_, i) => ({
-    id: `t${i + 1}`,
-    projectId: i < 10 ? 'p1' : 'p2',
-    number: (i % 10) + 1,
-    title: [
-      'Design new authentication flow', 'Fix latency on dashboard charts', 'Implement rich text for tasks', 
-      'Add multi-tenant isolation', 'Set up GitHub Actions', 'Audit log implementation', 
-      'User profile redesign', 'Dark mode support', 'Sprint planning UI', 'Mobile responsiveness fix',
-      'Optimize database queries', 'Kubernetes cluster setup', 'Redis caching layer', 
-      'S3 bucket configuration', 'Internal API documentation', 'Billing system integration',
-      'Error boundary implementation', 'Unit tests for core services', 'Load balancer tuning', 'SSL certificate renewal'
-    ][i],
-    description: 'This is a sample task description providing context for the mission.',
-    type: i % 3 === 0 ? 'BUG' : (i % 4 === 0 ? 'STORY' : 'TASK'),
-    status: i % 4 === 0 ? 'done' : (i % 2 === 0 ? 'in_progress' : 'todo'),
-    priority: i % 5 === 0 ? 'URGENT' : (i % 3 === 0 ? 'HIGH' : 'MEDIUM'),
-    assigneeId: i % 2 === 0 ? 'u1' : (i % 3 === 0 ? 'u2' : 'u3'),
-    reporterId: 'u1',
-    dueDate: new Date(Date.now() + (i - 10) * 86400000).toISOString(),
-    estimate: (i % 5) + 1,
-    labels: i % 2 === 0 ? ['frontend'] : ['backend'],
-    links: [],
-    createdAt: new Date(Date.now() - i * 3600000).toISOString(),
-    updatedAt: new Date().toISOString()
-  })),
+  tasks: Array.from({ length: 80 }).map((_, i) => {
+    const projectIds = ['p1', 'p2', 'p3', 'p4', 'p5', 'p6'];
+    const pId = projectIds[i % 6];
+    const userIds = ['u1', 'u2', 'u3', 'u4', 'u5'];
+    
+    const titles = [
+      'Initialize React Native project', 'Setup PostgreSQL cluster', 'Draft marketing copy', 'Fix login bug',
+      'Design UI components', 'Configure Redis cache', 'Social media integration', 'API rate limiting',
+      'User onboarding flow', 'Dockerize microservices', 'SEO optimization', 'Help center articles',
+      'Performance profiling', 'SSL certificate renewal', 'Content management system', 'Feedback loop setup',
+      'In-app notifications', 'Data migration scripts', 'Lead generation form', 'Live chat integration',
+      'Dark mode support', 'Kubernetes deployment', 'Banner assets design', 'Zendesk integration',
+      'Bug: Memory leak in list view', 'Refactor database models', 'Newsletter template', 'Password reset fix',
+      'Unit testing core utils', 'Terraform infrastructure', 'Landing page A/B test', 'Ticket priority logic',
+      'Audit log frontend', 'VPC network setup', 'Blog post: Product Launch', 'Sentry error tracking',
+      'Multi-language support', 'Elasticsearch setup', 'Pricing page redesign', 'Knowledge base search',
+      'Accessibility audit', 'Database backups', 'Affiliate program UI', 'Auto-assignment logic',
+      'Deep linking setup', 'Security patch 2.4', 'Testimonials section', 'Agent dashboard fixes',
+      'Analytics dashboard', 'CI/CD pipeline hardening', 'LLM Prompt Engineering', 'Vector Database Selection',
+      'Penetration Testing Scope', 'Auth0 Integration', 'GraphQL Schema Refactor', 'Mobile Push Certs',
+      'E2E Testing Suite', 'Prometheus Monitoring', 'Grafana Dashboard Setup', 'API Documentation v2',
+      'Stripe Webhook Handler', 'PDF Invoice Generator', 'User Data Export Tool', 'Slack Bot Integration',
+      'On-prem Deployment Guide', 'Firewall Policy Update', 'OAuth2 Flow Audit', 'GDPR Compliance Check',
+      'Redis Pub/Sub Layer', 'Websocket Scaling', 'Frontend Build Optimization', 'Image Compression Service',
+      'Backup Recovery Drill', 'Network Topology Map', 'Kubernetes Ingress Tweaks', 'Multi-region Failover',
+      'Data Lake Ingestion', 'ETL Pipeline Job', 'System Health Monitor', 'Nightly Maintenance Script'
+    ];
+
+    return {
+      id: `t${i + 1}`,
+      projectId: pId,
+      number: Math.floor(i / 6) + 1,
+      title: titles[i % titles.length],
+      description: `Operational mission item #${i + 1}. Crucial for project trajectory. Reference documentation in the wiki for technical specifics and compliance requirements.`,
+      type: i % 10 === 0 ? 'EPIC' : (i % 5 === 0 ? 'BUG' : (i % 3 === 0 ? 'STORY' : 'TASK')),
+      status: i % 7 === 0 ? 'done' : (i % 2 === 0 ? 'in_progress' : 'todo'),
+      priority: i % 15 === 0 ? 'URGENT' : (i % 4 === 0 ? 'HIGH' : 'MEDIUM'),
+      assigneeId: userIds[i % 5],
+      reporterId: 'u1',
+      dueDate: new Date(Date.now() + (i - 20) * 86400000).toISOString(),
+      estimate: (i % 5) + 1,
+      labels: i % 2 === 0 ? ['critical', 'sprint-ready'] : ['next-up', 'exploration'],
+      links: [],
+      createdAt: new Date(Date.now() - i * 3600000 * 2).toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+  }),
   sprints: [
-    { id: 's1', projectId: 'p1', name: 'Sprint 24: Core UI', status: 'ACTIVE', startDate: new Date().toISOString(), endDate: new Date(Date.now() + 14 * 86400000).toISOString() }
+    { id: 's1', projectId: 'p1', name: 'Sprint 1: Architecture', status: 'COMPLETED', startDate: new Date(Date.now() - 45 * 86400000).toISOString(), endDate: new Date(Date.now() - 31 * 86400000).toISOString() },
+    { id: 's2', projectId: 'p1', name: 'Sprint 2: UI/UX', status: 'ACTIVE', startDate: new Date(Date.now() - 2 * 86400000).toISOString(), endDate: new Date(Date.now() + 12 * 86400000).toISOString() },
+    { id: 's3', projectId: 'p2', name: 'Cloud Migration Phase 1', status: 'ACTIVE', startDate: new Date(Date.now() - 5 * 86400000).toISOString(), endDate: new Date(Date.now() + 25 * 86400000).toISOString() },
+    { id: 's4', projectId: 'p5', name: 'AI Model Training v1', status: 'ACTIVE', startDate: new Date().toISOString(), endDate: new Date(Date.now() + 14 * 86400000).toISOString() }
   ],
   wikiPages: [
-    { id: 'w1', projectId: 'p1', title: 'Onboarding Guide', content: 'Welcome to the Mobile App Revamp project...', updatedBy: 'u1', updatedAt: new Date().toISOString() },
-    { id: 'w2', projectId: 'p2', title: 'Infrastructure Specs', content: 'Our infrastructure uses K8s and AWS...', updatedBy: 'u2', updatedAt: new Date().toISOString() }
+    { id: 'w1', projectId: 'p1', title: 'Tech Stack Overview', content: 'Our project leverages React Native for cross-platform mobile development...', updatedBy: 'u1', updatedAt: new Date().toISOString() },
+    { id: 'w2', projectId: 'p1', title: 'Coding Standards', content: 'We follow a strict ESLint/Prettier configuration to ensure code quality...', updatedBy: 'u2', updatedAt: new Date().toISOString() },
+    { id: 'w3', projectId: 'p2', title: 'AWS Resource Map', content: 'Detailed topology of our VPC, Subnets, and S3 bucket access policies...', updatedBy: 'u2', updatedAt: new Date().toISOString() },
+    { id: 'w4', projectId: 'p3', title: 'Brand Identity', content: 'Guidelines for typography, color palettes, and voice tone for marketing...', updatedBy: 'u4', updatedAt: new Date().toISOString() },
+    { id: 'w5', projectId: 'p5', title: 'LLM Fine-tuning strategy', content: 'How we plan to use proprietary data to tune the underlying models...', updatedBy: 'u1', updatedAt: new Date().toISOString() },
+    { id: 'w6', projectId: 'p6', title: 'Incident Response Plan', content: 'Step-by-step procedure for handling security breaches or data leaks...', updatedBy: 'u5', updatedAt: new Date().toISOString() }
   ],
   comments: [
-    { id: 'c1', taskId: 't1', userId: 'u2', content: 'Almost finished with the prototype!', createdAt: new Date().toISOString() }
+    { id: 'c1', taskId: 't1', userId: 'u2', content: 'Initial boilerplate is pushed to the repo.', createdAt: new Date().toISOString() },
+    { id: 'c2', taskId: 't4', userId: 'u5', content: 'Confirmed the fix for the race condition in auth.', createdAt: new Date().toISOString() },
+    { id: 'c3', taskId: 't51', userId: 'u3', content: 'We need to benchmark different model providers.', createdAt: new Date().toISOString() }
   ],
   notifications: [
-    { id: 'n1', userId: 'u1', title: 'Assigned to task', message: 'You have been assigned to "Design new authentication flow"', read: false, createdAt: new Date().toISOString() },
-    { id: 'n2', userId: 'u1', title: 'Sprint Started', message: 'Sprint 24: Core UI has started.', read: true, createdAt: new Date(Date.now() - 86400000).toISOString() }
+    { id: 'n1', userId: 'u1', title: 'Critical Bug Assigned', message: 'Task "Fix login bug" assigned to your queue.', read: false, createdAt: new Date().toISOString() },
+    { id: 'n2', userId: 'u1', title: 'Sprint Report Ready', message: 'Sprint 1 report has been generated.', read: true, createdAt: new Date(Date.now() - 172800000).toISOString() },
+    { id: 'n3', userId: 'u1', title: 'Wiki Update', message: 'Sarah updated "Brand Identity" in Project MKT.', read: false, createdAt: new Date(Date.now() - 3600000).toISOString() }
   ],
-  timeEntries: [
-    { id: 'te1', taskId: 't1', userId: 'u1', duration: 120, note: 'Initial sketches', date: new Date().toISOString().split('T')[0], createdAt: new Date().toISOString() },
-    { id: 'te2', taskId: 't2', userId: 'u2', duration: 45, note: 'Debugging chart', date: new Date().toISOString().split('T')[0], createdAt: new Date().toISOString() }
-  ],
+  timeEntries: Array.from({ length: 40 }).map((_, i) => ({
+    id: `te${i + 1}`,
+    taskId: `t${(i % 30) + 1}`,
+    userId: ['u1', 'u2', 'u3', 'u4', 'u5'][i % 5],
+    duration: [15, 30, 45, 60, 120, 180][i % 6],
+    note: ['Coding', 'Meetings', 'Research', 'Code Review', 'Pair Programming', 'Documentation'][i % 6],
+    date: new Date(Date.now() - (i % 14) * 86400000).toISOString().split('T')[0],
+    createdAt: new Date().toISOString()
+  })),
   auditLogs: [
-    { id: 'log1', workspaceId: 'w1', actorId: 'u1', action: 'WORKSPACE_CREATE', targetType: 'WORKSPACE', targetId: 'w1', createdAt: new Date(Date.now() - 172800000).toISOString() },
-    { id: 'log2', workspaceId: 'w1', actorId: 'u1', action: 'PROJECT_CREATE', targetType: 'PROJECT', targetId: 'p1', createdAt: new Date(Date.now() - 86400000).toISOString() }
+    { id: 'log1', workspaceId: 'w1', actorId: 'u1', action: 'WORKSPACE_CREATE', targetType: 'WORKSPACE', targetId: 'w1', createdAt: new Date(Date.now() - 518400000).toISOString() },
+    { id: 'log2', workspaceId: 'w1', actorId: 'u1', action: 'MEMBER_INVITE', targetType: 'USER', targetId: 'u2', createdAt: new Date(Date.now() - 432000000).toISOString() },
+    { id: 'log3', workspaceId: 'w1', actorId: 'u1', action: 'PROJECT_CREATE', targetType: 'PROJECT', targetId: 'p1', createdAt: new Date(Date.now() - 345600000).toISOString() },
+    { id: 'log4', workspaceId: 'w1', actorId: 'u1', action: 'PROJECT_CREATE', targetType: 'PROJECT', targetId: 'p5', createdAt: new Date(Date.now() - 172800000).toISOString() }
   ],
   preferences: [
     { userId: 'u1', theme: 'light', accent: 'ocean', notifications: { email: true, push: true, mentions: true } }
@@ -166,12 +242,12 @@ const INITIAL_DATA: AppState = {
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, setState] = useState<AppState>(() => {
-    const saved = localStorage.getItem('aslam_pm_v7_prod');
+    const saved = localStorage.getItem('aslam_pm_v9_prod');
     return saved ? JSON.parse(saved) : INITIAL_DATA;
   });
 
   useEffect(() => {
-    localStorage.setItem('aslam_pm_v7_prod', JSON.stringify(state));
+    localStorage.setItem('aslam_pm_v9_prod', JSON.stringify(state));
     const userPref = state.preferences.find(p => p.userId === state.currentUser?.id);
     const workspace = state.workspaces.find(w => w.id === state.currentWorkspaceId);
     
@@ -204,7 +280,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (!role) return false;
     if (role === 'OWNER') return true;
     if (role === 'ADMIN') return !['DELETE_WORKSPACE', 'MANAGE_BILLING', 'ARCHIVE_WORKSPACE'].includes(action);
-    if (role === 'MEMBER') return ['CREATE_TASK', 'EDIT_TASK', 'COMMENT', 'VIEW_REPORTS', 'VIEW_MEMBERS'].includes(action);
+    if (role === 'MEMBER') return ['CREATE_TASK', 'EDIT_TASK', 'COMMENT', 'VIEW_REPORTS', 'VIEW_MEMBERS', 'CREATE_PROJECT'].includes(action);
     if (role === 'VIEWER') return ['VIEW_REPORTS', 'VIEW_MEMBERS'].includes(action);
     return false;
   }, [userRoleInWorkspace]);
@@ -259,7 +335,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     },
     updateTask: (id: string, updates: any) => setState(prev => ({ ...prev, tasks: prev.tasks.map(t => t.id === id ? { ...t, ...updates } : t) })),
     deleteTask: (id: string) => setState(prev => ({ ...prev, tasks: prev.tasks.filter(t => t.id !== id) })),
-    addProject: (p: any) => setState(prev => ({ ...prev, projects: [...prev.projects, { ...p, id: `p${Date.now()}` }] })),
+    addProject: (p: any) => {
+      const newProj = { ...p, id: `p${Date.now()}`, workflow: [
+        { id: 'todo', label: 'To Do', category: 'TODO' },
+        { id: 'in_progress', label: 'In Progress', category: 'IN_PROGRESS' },
+        { id: 'done', label: 'Done', category: 'DONE' }
+      ] };
+      setState(prev => ({ ...prev, projects: [...prev.projects, newProj] }));
+    },
     updateProject: (id: string, updates: any) => setState(prev => ({ ...prev, projects: prev.projects.map(p => p.id === id ? { ...p, ...updates } : p) })),
     deleteProject: (id: string) => setState(prev => ({ ...prev, projects: prev.projects.filter(p => p.id !== id) })),
     createWikiPage: (p: any) => setState(prev => ({ ...prev, wikiPages: [...prev.wikiPages, { ...p, id: `w${Date.now()}`, updatedAt: new Date().toISOString() }] })),
