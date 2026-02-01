@@ -154,6 +154,16 @@ export interface Task {
   updatedAt: string;
 }
 
+export interface TimeEntry {
+  id: string;
+  taskId: string;
+  userId: string;
+  duration: number; // in minutes
+  note?: string;
+  date: string;
+  createdAt: string;
+}
+
 export interface WikiPage {
   id: string;
   projectId: string;
